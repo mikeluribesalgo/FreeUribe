@@ -18,6 +18,7 @@ public class Prueba {
     private static final char MISS = 'O';
     private static final char HIT = 'X';
     private static final char SHIP = 'S'; // interno (no mostrar)
+    //ene
 
     // Barcos: portaviones 5, acorazado 4, crucero 3, submarino 3, destructor 2
     private static final int[] SHIPS = {5, 4, 3, 3, 2};
