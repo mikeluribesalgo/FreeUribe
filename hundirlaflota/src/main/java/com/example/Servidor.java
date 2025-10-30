@@ -49,13 +49,13 @@ public class Servidor {
         serverSocket.close();
     }
 
-    private static char[][] crearTablero() {
+    public static char[][] crearTablero() {
         char[][] t = new char[3][3];
         for (char[] fila : t) Arrays.fill(fila, '-');
         return t;
     }
 
-    private static void colocarBarco(char[][] tablero) {
+    public static void colocarBarco(char[][] tablero) {
         Scanner sc = new Scanner(System.in);
         System.out.print("Coloca tu barco (ej: A1): ");
         String coord = sc.nextLine().toUpperCase();
@@ -64,7 +64,7 @@ public class Servidor {
         tablero[fila][col] = 'B';
     }
 
-    private static String procesarDisparo(char[][] tablero, String disparo) {
+    public static String procesarDisparo(char[][] tablero, String disparo) {
         int fila = disparo.charAt(0) - 'A';
         int col = disparo.charAt(1) - '1';
         if (tablero[fila][col] == 'B') {
