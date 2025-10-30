@@ -3,6 +3,7 @@ package com.example;
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
+import javax.swing.WindowConstants;
 
 public class GameFrame extends JFrame {
     private static final int SIZE = 10;
@@ -18,7 +19,7 @@ public class GameFrame extends JFrame {
 
     public GameFrame() {
         super("Hundir la Flota");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
         engine = new GameEngine(SIZE);

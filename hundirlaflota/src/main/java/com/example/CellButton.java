@@ -3,7 +3,8 @@ package com.example;
 import javax.swing.JButton;
 
 public class CellButton extends JButton {
-    final int row, col;
+    final int row;
+    final int col;
 
     CellButton(int r, int c) {
         super();

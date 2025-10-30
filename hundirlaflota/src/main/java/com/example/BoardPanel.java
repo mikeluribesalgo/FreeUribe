@@ -38,7 +38,8 @@ public class BoardPanel extends JPanel {
                 btn.setPreferredSize(new Dimension(36, 36));
                 btn.setOpaque(true);
                 btn.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-                final int rr = r, cc = c;
+                final int rr = r;
+                final int cc = c;
                 btn.addActionListener(e -> {
                     if (listener != null)
                         listener.cellClicked(rr, cc);

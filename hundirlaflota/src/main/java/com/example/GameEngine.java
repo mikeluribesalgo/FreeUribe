@@ -54,7 +54,7 @@ public class GameEngine {
                 }
             }
             if (!placed)
-                throw new RuntimeException("No se pudo colocar un barco después de muchos intentos");
+                throw new IllegalArgumentException("No se pudo colocar un barco después de muchos intentos");
         }
     }
 

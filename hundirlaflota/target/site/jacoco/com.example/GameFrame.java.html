@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameFrame.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Example of multilingual Maven project</a> &gt; <a href="index.source.html" class="el_package">com.example</a> &gt; <span class="el_source">GameFrame.java</span></div><h1>GameFrame.java</h1><pre class="source lang-java linenums">package com.example;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.*;
+import javax.swing.WindowConstants;
+
+public class GameFrame extends JFrame {
+    private static final int SIZE = 10;
+    private BoardPanel playerPanel;
+    private BoardPanel enemyPanel;
+    private GameEngine engine;
+    private JLabel statusLabel;
+
+    // NUEVO: lista de tamaños de barcos a colocar
+<span class="nc" id="L16">    private Queue&lt;Integer&gt; shipsToPlace = new LinkedList&lt;&gt;(Arrays.asList(5, 4, 3, 3, 2));</span>
+<span class="nc" id="L17">    private boolean placementPhase = true;</span>
+<span class="nc" id="L18">    private boolean horizontal = true;</span>
+
+    public GameFrame() {
+<span class="nc" id="L21">        super(&quot;Hundir la Flota&quot;);</span>
+<span class="nc" id="L22">        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L23">        setResizable(false);</span>
+
+<span class="nc" id="L25">        engine = new GameEngine(SIZE);</span>
+        // Tablero del jugador vacío (sin barcos)
+<span class="nc" id="L27">        engine.getPlayerBoard().clearBoard();</span>
+
+<span class="nc" id="L29">        playerPanel = new BoardPanel(engine.getPlayerBoard(), false);</span>
+<span class="nc" id="L30">        enemyPanel = new BoardPanel(engine.getEnemyBoard(), true);</span>
+
+        // --- COLOCACIÓN MANUAL ---
+<span class="nc" id="L33">        playerPanel.setCellClickListener((r, c) -&gt; {</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">            if (!placementPhase) return;</span>
+
+<span class="nc" id="L36">            int shipSize = shipsToPlace.peek(); // siguiente barco</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">            if (shipSize == 0) return;</span>
+
+<span class="nc" id="L39">            Board board = engine.getPlayerBoard();</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">            if (board.canPlaceShip(r, c, shipSize, horizontal)) {</span>
+<span class="nc" id="L41">                board.placeShip(new Ship(r, c, shipSize, horizontal));</span>
+<span class="nc" id="L42">                shipsToPlace.poll(); // quitar el que ya se colocó</span>
+<span class="nc" id="L43">                playerPanel.repaintGrid();</span>
+
+<span class="nc bnc" id="L45" title="All 2 branches missed.">                if (shipsToPlace.isEmpty()) {</span>
+<span class="nc" id="L46">                    placementPhase = false;</span>
+<span class="nc" id="L47">                    statusLabel.setText(&quot;¡Barcos colocados! Empieza el juego. Dispara al enemigo.&quot;);</span>
+                } else {
+<span class="nc" id="L49">                    statusLabel.setText(&quot;Coloca un barco de tamaño &quot; + shipsToPlace.peek() +</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">                            &quot; (&quot; + (horizontal ? &quot;horizontal&quot; : &quot;vertical&quot;) + &quot;)&quot;);</span>
+                }
+            } else {
+<span class="nc" id="L53">                statusLabel.setText(&quot;No se puede colocar el barco ahí.&quot;);</span>
+            }
+<span class="nc" id="L55">        });</span>
+
+        // --- DISPAROS ---
+<span class="nc" id="L58">        enemyPanel.setCellClickListener((r, c) -&gt; {</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">            if (placementPhase) return; // aún colocando barcos</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (engine.isGameOver()) return;</span>
+
+<span class="nc" id="L62">            boolean valid = engine.playerShoot(r, c);</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">            if (!valid) return;</span>
+<span class="nc" id="L64">            refreshBoards();</span>
+
+<span class="nc bnc" id="L66" title="All 2 branches missed.">            if (engine.isGameOver()) {</span>
+<span class="nc" id="L67">                statusLabel.setText(&quot;¡Has ganado!&quot;);</span>
+<span class="nc" id="L68">                return;</span>
+            }
+
+<span class="nc" id="L71">            engine.cpuTurn();</span>
+<span class="nc" id="L72">            refreshBoards();</span>
+
+<span class="nc bnc" id="L74" title="All 2 branches missed.">            if (engine.isGameOver()) {</span>
+<span class="nc" id="L75">                statusLabel.setText(&quot;Has perdido. La CPU ha ganado.&quot;);</span>
+<span class="nc" id="L76">                return;</span>
+            }
+
+<span class="nc" id="L79">            statusLabel.setText(&quot;Dispara al tablero enemigo. &quot; + engine.getStats());</span>
+<span class="nc" id="L80">        });</span>
+
+        // --- BOTONES Y UI ---
+<span class="nc" id="L83">        JButton rotate = new JButton(&quot;Rotar (H/V)&quot;);</span>
+<span class="nc" id="L84">        rotate.addActionListener(e -&gt; {</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            horizontal = !horizontal;</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">            if (placementPhase)</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">                statusLabel.setText(&quot;Modo: &quot; + (horizontal ? &quot;Horizontal&quot; : &quot;Vertical&quot;));</span>
+<span class="nc" id="L88">        });</span>
+
+<span class="nc" id="L90">        JButton restart = new JButton(&quot;Reiniciar&quot;);</span>
+<span class="nc" id="L91">        restart.addActionListener(e -&gt; restartGame());</span>
+
+<span class="nc" id="L93">        statusLabel = new JLabel(&quot;Coloca un barco de tamaño &quot; + shipsToPlace.peek(), SwingConstants.CENTER);</span>
+
+<span class="nc" id="L95">        JPanel controls = new JPanel();</span>
+<span class="nc" id="L96">        controls.add(rotate);</span>
+<span class="nc" id="L97">        controls.add(restart);</span>
+
+<span class="nc" id="L99">        JPanel center = new JPanel(new GridLayout(1, 2, 10, 10));</span>
+<span class="nc" id="L100">        center.add(wrapWithTitle(playerPanel, &quot;Tu tablero&quot;));</span>
+<span class="nc" id="L101">        center.add(wrapWithTitle(enemyPanel, &quot;Tablero enemigo&quot;));</span>
+
+<span class="nc" id="L103">        JPanel bottom = new JPanel(new BorderLayout());</span>
+<span class="nc" id="L104">        bottom.add(statusLabel, BorderLayout.CENTER);</span>
+<span class="nc" id="L105">        bottom.add(controls, BorderLayout.EAST);</span>
+
+<span class="nc" id="L107">        getContentPane().setLayout(new BorderLayout(10, 10));</span>
+<span class="nc" id="L108">        getContentPane().add(center, BorderLayout.CENTER);</span>
+<span class="nc" id="L109">        getContentPane().add(bottom, BorderLayout.SOUTH);</span>
+
+<span class="nc" id="L111">        pack();</span>
+<span class="nc" id="L112">        setLocationRelativeTo(null);</span>
+<span class="nc" id="L113">    }</span>
+
+    private void restartGame() {
+<span class="nc" id="L116">        engine.reset();</span>
+<span class="nc" id="L117">        engine.getPlayerBoard().clearBoard();</span>
+<span class="nc" id="L118">        shipsToPlace = new LinkedList&lt;&gt;(Arrays.asList(5, 4, 3, 3, 2));</span>
+<span class="nc" id="L119">        placementPhase = true;</span>
+<span class="nc" id="L120">        horizontal = true;</span>
+<span class="nc" id="L121">        playerPanel.setBoard(engine.getPlayerBoard());</span>
+<span class="nc" id="L122">        enemyPanel.setBoard(engine.getEnemyBoard());</span>
+<span class="nc" id="L123">        refreshBoards();</span>
+<span class="nc" id="L124">        statusLabel.setText(&quot;Coloca un barco de tamaño &quot; + shipsToPlace.peek());</span>
+<span class="nc" id="L125">    }</span>
+
+    private JPanel wrapWithTitle(JComponent comp, String title) {
+<span class="nc" id="L128">        JPanel p = new JPanel(new BorderLayout());</span>
+<span class="nc" id="L129">        JLabel l = new JLabel(title, SwingConstants.CENTER);</span>
+<span class="nc" id="L130">        l.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));</span>
+<span class="nc" id="L131">        p.add(l, BorderLayout.NORTH);</span>
+<span class="nc" id="L132">        p.add(comp, BorderLayout.CENTER);</span>
+<span class="nc" id="L133">        return p;</span>
+    }
+
+    private void refreshBoards() {
+<span class="nc" id="L137">        playerPanel.repaintGrid();</span>
+<span class="nc" id="L138">        enemyPanel.repaintGrid();</span>
+<span class="nc" id="L139">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

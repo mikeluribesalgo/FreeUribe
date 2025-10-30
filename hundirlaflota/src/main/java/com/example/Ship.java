@@ -5,14 +5,14 @@ public class Ship {
     final boolean horizontal;
     private int hits = 0;
 
-    Ship(int r, int c, int length, boolean horizontal) {
+    public Ship(int r, int c, int length, boolean horizontal) {
         this.r = r;
         this.c = c;
         this.length = length;
         this.horizontal = horizontal;
     }
 
-    void hit() {
+    public void hit() {
         hits++;
     }
 
