@@ -43,6 +43,16 @@ public class Board {
         }
     }
 
+    public void clearBoard() {
+        ships.clear();
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                cells[r][c].state = CellState.EMPTY;
+                cells[r][c].ship = null;
+            }
+        }
+    }
+
     private Cell horizontalCell(Ship ship, int i) {
         return ship.horizontal ? cells[ship.r][ship.c + i] : cells[ship.r + i][ship.c];
     }
