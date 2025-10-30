@@ -14,8 +14,8 @@
         <maven.compiler.source>11</maven.compiler.source>
         <java.version>11</java.version>
         <kotlin.version>1.4.10</kotlin.version>
-        <sonar.projectKey>prueba1</sonar.projectKey>
-        <sonar.projectName>prueba1</sonar.projectName>
+        <sonar.projectKey>Hundirlaflota</sonar.projectKey>
+        <sonar.projectName>Hundirlaflota</sonar.projectName>
         <sonar.sources>src/main/java</sonar.sources>
     </properties>
     <dependencies>

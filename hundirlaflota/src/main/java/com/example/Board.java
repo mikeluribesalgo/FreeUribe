@@ -35,7 +35,7 @@ public class Board {
 
     void placeShip(Ship ship) {
         ships.add(ship);
-        int r = ship.r, c = ship.c;
+        
         for (int i = 0; i < ship.length; i++) {
             Cell cell = horizontalCell(ship, i);
             cell.state = CellState.SHIP;
