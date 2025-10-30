@@ -8,7 +8,7 @@ public class Board {
     final Cell[][] cells;
     final List<Ship> ships = new ArrayList<>();
 
-    Board(int size) {
+    public Board(int size) {
         this.size = size;
         cells = new Cell[size][size];
         for (int r = 0; r < size; r++)
@@ -16,7 +16,19 @@ public class Board {
                 cells[r][c] = new Cell();
     }
 
-    boolean canPlaceShip(int r, int c, int length, boolean horizontal) {
+    public int getSize() {
+        return size;
+    }
+
+    public Cell getCell(int r, int c) {
+        return cells[r][c];
+    }
+
+    public List<Ship> getShips() {
+        return ships;
+    }
+
+    public boolean canPlaceShip(int r, int c, int length, boolean horizontal) {
         if (horizontal) {
             if (c + length > size)
                 return false;
@@ -33,7 +45,7 @@ public class Board {
         return true;
     }
 
-    void placeShip(Ship ship) {
+    public void placeShip(Ship ship) {
         ships.add(ship);
         int r = ship.r, c = ship.c;
         for (int i = 0; i < ship.length; i++) {
@@ -57,14 +69,14 @@ public class Board {
         return ship.horizontal ? cells[ship.r][ship.c + i] : cells[ship.r + i][ship.c];
     }
 
-    boolean hasRemainingShips() {
+    public boolean hasRemainingShips() {
         for (Ship s : ships)
             if (!s.isSunk())
                 return true;
         return false;
     }
 
-    int remainingShipsCount() {
+    public int remainingShipsCount() {
         int c = 0;
         for (Ship s : ships)
             if (!s.isSunk())
