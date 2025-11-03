@@ -2,5 +2,5 @@ projectKey=Hundirlaflota
 serverUrl=http://localhost:9000
 serverVersion=25.9.0.112764
 dashboardUrl=http://localhost:9000/dashboard?id=Hundirlaflota
-ceTaskId=d489e170-9f0c-4f68-9bb8-ced0c8adc1b5
-ceTaskUrl=http://localhost:9000/api/ce/task?id=d489e170-9f0c-4f68-9bb8-ced0c8adc1b5
+ceTaskId=868a508d-0466-443b-b159-3838acd55f4e
+ceTaskUrl=http://localhost:9000/api/ce/task?id=868a508d-0466-443b-b159-3838acd55f4e
