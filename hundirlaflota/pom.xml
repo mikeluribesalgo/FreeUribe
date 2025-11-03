@@ -14,8 +14,13 @@
         <maven.compiler.source>11</maven.compiler.source>
         <java.version>11</java.version>
         <kotlin.version>1.4.10</kotlin.version>
+<<<<<<< HEAD
         <sonar.projectKey>prueba1</sonar.projectKey>
         <sonar.projectName>prueba1</sonar.projectName>
+=======
+        <sonar.projectKey>Hundirlaflota</sonar.projectKey>
+        <sonar.projectName>Hundirlaflota</sonar.projectName>
+>>>>>>> 787cd91885764ba934581326ba996626a3803122
         <sonar.sources>src/main/java</sonar.sources>
     </properties>
     <dependencies>
@@ -32,11 +37,18 @@
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
+<<<<<<< HEAD
             <artifactId>junit-jupiter</artifactId>
             <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
 
+=======
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.10.0</version>
+            <scope>test</scope>
+        </dependency>
+>>>>>>> 787cd91885764ba934581326ba996626a3803122
     </dependencies>
     <build>
         <pluginManagement>
