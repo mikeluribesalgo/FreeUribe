@@ -29,21 +29,26 @@ public class Board {
     }
 
     public boolean canPlaceShip(int r, int c, int length, boolean horizontal) {
-        if (horizontal) {
-            if (c + length > size)
-                return false;
-            for (int i = 0; i < length; i++)
-                if (cells[r][c + i].state != CellState.EMPTY)
-                    return false;
-        } else {
-            if (r + length > size)
-                return false;
-            for (int i = 0; i < length; i++)
-                if (cells[r + i][c].state != CellState.EMPTY)
-                    return false;
-        }
-        return true;
+    int dr = horizontal ? 0 : 1;
+    int dc = horizontal ? 1 : 0;
+
+    
+    int endRow = r + dr * (length - 1);
+    int endCol = c + dc * (length - 1);
+    if (endRow >= size || endCol >= size)
+        return false;
+
+    
+    for (int i = 0; i < length; i++) {
+        int row = r + dr * i;
+        int col = c + dc * i;
+        if (cells[row][col].state != CellState.EMPTY)
+            return false;
     }
+
+    return true;
+}
+
 
     public void placeShip(Ship ship) {
         ships.add(ship);

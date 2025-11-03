@@ -10,9 +10,9 @@ public class BoardPanel extends JPanel {
 
     
     private CellButton[][] buttons;
-    private Board board;
+    private transient  Board board;
     private boolean hideShips;
-    private CellClickListener listener;
+    private transient  CellClickListener listener;
 
     public BoardPanel (Board board, boolean hideShips)  {
         

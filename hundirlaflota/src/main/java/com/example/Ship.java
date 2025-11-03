@@ -1,7 +1,9 @@
 package com.example;
 
 public class Ship {
-    final int r, c, length;
+    final int r; 
+    final int c;
+    final int length;
     final boolean horizontal;
     private int hits = 0;
 

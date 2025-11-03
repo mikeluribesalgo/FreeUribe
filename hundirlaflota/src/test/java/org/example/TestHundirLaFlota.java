@@ -1,3 +1,5 @@
+package org.example;
+
 import javax.swing.SwingUtilities;
 
 import org.junit.Test;

@@ -3,94 +3,128 @@ package com.example;
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
-import javax.swing.WindowConstants;
+import java.util.Queue;
 
 public class GameFrame extends JFrame {
     private static final int SIZE = 10;
     private BoardPanel playerPanel;
     private BoardPanel enemyPanel;
-    private GameEngine engine;
+    private transient  GameEngine engine;
     private JLabel statusLabel;
 
-    // NUEVO: lista de tamaños de barcos a colocar
-    private Queue<Integer> shipsToPlace = new LinkedList<>(Arrays.asList(5, 4, 3, 3, 2));
-    private boolean placementPhase = true;
-    private boolean horizontal = true;
+    private Queue<Integer> shipsToPlace;
+    private boolean placementPhase;
+    private boolean horizontal;
 
+    // 🔹 Constructor por defecto
     public GameFrame() {
+        this(new GameEngine(SIZE)); // Llama al otro constructor
+    }
+
+    // 🔹 Constructor sobrecargado (permite pasar un GameEngine externo)
+    public GameFrame(GameEngine engine) {
         super("Hundir la Flota");
+        this.engine = engine;
+        initGameFrame();
+    }
+
+    // --- Inicialización general ---
+    private void initGameFrame() {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
-        engine = new GameEngine(SIZE);
-        // Tablero del jugador vacío (sin barcos)
-        engine.getPlayerBoard().clearBoard();
+        setupInitialState();
+        setupBoards();
+        setupListeners();
+        setupUI();
 
+        pack();
+        setLocationRelativeTo(null);
+    }
+
+    // --- Estado inicial ---
+    private void setupInitialState() {
+        shipsToPlace = new LinkedList<>(Arrays.asList(5, 4, 3, 3, 2));
+        placementPhase = true;
+        horizontal = true;
+        engine.getPlayerBoard().clearBoard();
+    }
+
+    // --- Crear paneles ---
+    private void setupBoards() {
         playerPanel = new BoardPanel(engine.getPlayerBoard(), false);
         enemyPanel = new BoardPanel(engine.getEnemyBoard(), true);
+    }
 
-        // --- COLOCACIÓN MANUAL ---
+    // --- Listeners ---
+    private void setupListeners() {
+        setupPlacementListener();
+        setupEnemyListener();
+    }
+
+    private void setupPlacementListener() {
         playerPanel.setCellClickListener((r, c) -> {
             if (!placementPhase) return;
 
-            int shipSize = shipsToPlace.peek(); // siguiente barco
-            if (shipSize == 0) return;
+            Integer shipSize = shipsToPlace.peek();
+            if (shipSize == null) return;
 
             Board board = engine.getPlayerBoard();
             if (board.canPlaceShip(r, c, shipSize, horizontal)) {
                 board.placeShip(new Ship(r, c, shipSize, horizontal));
-                shipsToPlace.poll(); // quitar el que ya se colocó
+                shipsToPlace.poll();
                 playerPanel.repaintGrid();
-
-                if (shipsToPlace.isEmpty()) {
-                    placementPhase = false;
-                    statusLabel.setText("¡Barcos colocados! Empieza el juego. Dispara al enemigo.");
-                } else {
-                    statusLabel.setText("Coloca un barco de tamaño " + shipsToPlace.peek() +
-                            " (" + (horizontal ? "horizontal" : "vertical") + ")");
-                }
+                updatePlacementStatus();
             } else {
                 statusLabel.setText("No se puede colocar el barco ahí.");
             }
         });
+    }
 
-        // --- DISPAROS ---
+    private void updatePlacementStatus() {
+        if (shipsToPlace.isEmpty()) {
+            placementPhase = false;
+            statusLabel.setText("¡Barcos colocados! Empieza el juego. Dispara al enemigo.");
+        } else {
+            statusLabel.setText("Coloca un barco de tamaño " + shipsToPlace.peek() +
+                    " (" + (horizontal ? "horizontal" : "vertical") + ")");
+        }
+    }
+
+    private void setupEnemyListener() {
         enemyPanel.setCellClickListener((r, c) -> {
-            if (placementPhase) return; // aún colocando barcos
-            if (engine.isGameOver()) return;
+            if (placementPhase || engine.isGameOver()) return;
+            if (!engine.playerShoot(r, c)) return;
 
-            boolean valid = engine.playerShoot(r, c);
-            if (!valid) return;
             refreshBoards();
-
-            if (engine.isGameOver()) {
-                statusLabel.setText("¡Has ganado!");
-                return;
-            }
+            if (checkGameEnd()) return;
 
             engine.cpuTurn();
             refreshBoards();
-
-            if (engine.isGameOver()) {
-                statusLabel.setText("Has perdido. La CPU ha ganado.");
-                return;
-            }
+            if (checkGameEnd()) return;
 
             statusLabel.setText("Dispara al tablero enemigo. " + engine.getStats());
         });
+    }
 
-        // --- BOTONES Y UI ---
+    // 🔹 Solo mensajes básicos de fin de juego
+    private boolean checkGameEnd() {
+        if (engine.isGameOver()) {
+            statusLabel.setText("El juego ha terminado.");
+            return true;
+        }
+        return false;
+    }
+
+    // --- UI ---
+    private void setupUI() {
         JButton rotate = new JButton("Rotar (H/V)");
-        rotate.addActionListener(e -> {
-            horizontal = !horizontal;
-            if (placementPhase)
-                statusLabel.setText("Modo: " + (horizontal ? "Horizontal" : "Vertical"));
-        });
+        rotate.addActionListener(e -> toggleOrientation());
 
         JButton restart = new JButton("Reiniciar");
         restart.addActionListener(e -> restartGame());
 
-        statusLabel = new JLabel("Coloca un barco de tamaño " + shipsToPlace.peek(), SwingConstants.CENTER);
+        statusLabel = new JLabel("Coloca un barco de tamañ " + shipsToPlace.peek(), SwingConstants.CENTER);
 
         JPanel controls = new JPanel();
         controls.add(rotate);
@@ -107,21 +141,22 @@ public class GameFrame extends JFrame {
         getContentPane().setLayout(new BorderLayout(10, 10));
         getContentPane().add(center, BorderLayout.CENTER);
         getContentPane().add(bottom, BorderLayout.SOUTH);
+    }
 
-        pack();
-        setLocationRelativeTo(null);
+    private void toggleOrientation() {
+        horizontal = !horizontal;
+        if (placementPhase) {
+            statusLabel.setText("Modo: " + (horizontal ? "Horizontal" : "Vertical"));
+        }
     }
 
     private void restartGame() {
         engine.reset();
-        engine.getPlayerBoard().clearBoard();
-        shipsToPlace = new LinkedList<>(Arrays.asList(5, 4, 3, 3, 2));
-        placementPhase = true;
-        horizontal = true;
+        setupInitialState();
         playerPanel.setBoard(engine.getPlayerBoard());
         enemyPanel.setBoard(engine.getEnemyBoard());
         refreshBoards();
-        statusLabel.setText("Coloca un barco de tamaño " + shipsToPlace.peek());
+        statusLabel.setText("Coloca un barco de tam " + shipsToPlace.peek());
     }
 
     private JPanel wrapWithTitle(JComponent comp, String title) {
