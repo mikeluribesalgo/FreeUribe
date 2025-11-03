@@ -7,7 +7,7 @@ import com.example.Ship;
 
 import static org.junit.jupiter.api.Assertions.*;
 
- class BoardTest {
+class BoardTest {
 
     private Board board;
 
