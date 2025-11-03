@@ -3,17 +3,20 @@ package com.example;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import java.awt.GridLayout;
+import java.io.Serializable;
 import java.awt.Color;
 import java.awt.Dimension;
 
-public class BoardPanel extends JPanel {
+public class BoardPanel extends JPanel implements Serializable {
 
+    private static final long serialVersionUID = 2405172041950251807L;
     private CellButton[][] buttons;
     private Board board;
     private boolean hideShips;
     private CellClickListener listener;
 
-    public BoardPanel(Board board, boolean hideShips) {
+    public BoardPanel (Board board, boolean hideShips)  {
+        
         this.board = board;
         this.hideShips = hideShips;
         setLayout(new GridLayout(board.size, board.size));
