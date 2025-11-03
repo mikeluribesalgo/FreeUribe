@@ -3,13 +3,12 @@ package com.example;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import java.awt.GridLayout;
-import java.io.Serializable;
 import java.awt.Color;
 import java.awt.Dimension;
 
-public class BoardPanel extends JPanel implements Serializable {
+public class BoardPanel extends JPanel {
 
-    private static final long serialVersionUID = 2405172041950251807L;
+    
     private CellButton[][] buttons;
     private Board board;
     private boolean hideShips;
