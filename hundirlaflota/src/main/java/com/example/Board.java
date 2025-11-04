@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Board {
-    final int size;
-    final Cell[][] cells;
+    public final int size;
+    public final Cell[][] cells;
     final List<Ship> ships = new ArrayList<>();
 
     public Board(int size) {
@@ -42,7 +42,7 @@ public class Board {
     for (int i = 0; i < length; i++) {
         int row = r + dr * i;
         int col = c + dc * i;
-        if (cells[row][col].state != CellState.EMPTY)
+        if (cells[row][col].getState() != CellState.EMPTY)
             return false;
     }
 
@@ -55,7 +55,7 @@ public class Board {
         
         for (int i = 0; i < ship.length; i++) {
             Cell cell = horizontalCell(ship, i);
-            cell.state = CellState.SHIP;
+            cell.setState(CellState.SHIP);
             cell.ship = ship;
         }
     }

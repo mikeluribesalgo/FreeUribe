@@ -5,6 +5,8 @@ import java.awt.*;
 import java.util.*;
 import java.util.Queue;
 
+
+
 public class GameFrame extends JFrame {
     private static final int SIZE = 10;
     private BoardPanel playerPanel;
