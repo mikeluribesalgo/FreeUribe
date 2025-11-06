@@ -198,7 +198,7 @@ public class GameFrame extends JFrame {
         getContentPane().add(bottom, BorderLayout.SOUTH);
     }
 
-    private void toggleOrientation() {
+    public void toggleOrientation() {
         horizontal = !horizontal;
         if (placementPhase)
             statusLabel.setText("Modo: " + (horizontal ? "Horizontal" : "Vertical"));
