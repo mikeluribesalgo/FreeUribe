@@ -1,11 +1,11 @@
-package com.example;
+package com.example.game;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Board {
-    final int size;
-    final Cell[][] cells;
+    public final int size;
+    public final Cell[][] cells;
     final List<Ship> ships = new ArrayList<>();
 
     public Board(int size) {
@@ -29,29 +29,34 @@ public class Board {
     }
 
     public boolean canPlaceShip(int r, int c, int length, boolean horizontal) {
-        if (horizontal) {
-            if (c + length > size)
-                return false;
-            for (int i = 0; i < length; i++)
-                if (cells[r][c + i].state != CellState.EMPTY)
-                    return false;
-        } else {
-            if (r + length > size)
-                return false;
-            for (int i = 0; i < length; i++)
-                if (cells[r + i][c].state != CellState.EMPTY)
-                    return false;
-        }
-        return true;
+    int dr = horizontal ? 0 : 1;
+    int dc = horizontal ? 1 : 0;
+
+    
+    int endRow = r + dr * (length - 1);
+    int endCol = c + dc * (length - 1);
+    if (endRow >= size || endCol >= size)
+        return false;
+
+    
+    for (int i = 0; i < length; i++) {
+        int row = r + dr * i;
+        int col = c + dc * i;
+        if (cells[row][col].getState() != CellState.EMPTY)
+            return false;
     }
+
+    return true;
+}
+
 
     public void placeShip(Ship ship) {
         ships.add(ship);
         
         for (int i = 0; i < ship.length; i++) {
             Cell cell = horizontalCell(ship, i);
-            cell.state = CellState.SHIP;
-            cell.ship = ship;
+            cell.setState(CellState.SHIP);
+            cell.setShip(ship);
         }
     }
 
@@ -59,8 +64,8 @@ public class Board {
         ships.clear();
         for (int r = 0; r < size; r++) {
             for (int c = 0; c < size; c++) {
-                cells[r][c].state = CellState.EMPTY;
-                cells[r][c].ship = null;
+                cells[r][c].setState(CellState.EMPTY);
+                cells[r][c].setShip( null);
             }
         }
     }

@@ -1,18 +1,25 @@
-package com.example;
+package com.example.gui;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+
+import com.example.game.Board;
+import com.example.game.Cell;
+
 import java.awt.GridLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+
+
+
 
 public class BoardPanel extends JPanel {
 
     
     private CellButton[][] buttons;
-    private Board board;
+    private transient  Board board;
     private boolean hideShips;
-    private CellClickListener listener;
+    private transient  CellClickListener listener;
 
     public BoardPanel (Board board, boolean hideShips)  {
         
@@ -62,7 +69,7 @@ public class BoardPanel extends JPanel {
             for (int c = 0; c < board.size; c++) {
                 Cell cell = board.cells[r][c];
                 CellButton btn = buttons[r][c];
-                switch (cell.state) {
+                switch (cell.getState()) {
                     case EMPTY:
                         btn.setText("");
                         btn.setBackground(new Color(173, 216, 230)); // agua

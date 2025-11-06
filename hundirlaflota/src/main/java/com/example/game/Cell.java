@@ -1,8 +1,8 @@
-package com.example;
+package com.example.game;
 
 public class Cell {
-    CellState state = CellState.EMPTY;
-    Ship ship = null;
+    private CellState state = CellState.EMPTY;
+    private Ship ship = null;
 
     public CellState getState() {
         return state;

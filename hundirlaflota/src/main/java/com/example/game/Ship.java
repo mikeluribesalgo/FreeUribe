@@ -1,7 +1,9 @@
-package com.example;
+package com.example.game;
 
 public class Ship {
-    final int r, c, length;
+    final int r; 
+    final int c;
+    final int length;
     final boolean horizontal;
     private int hits = 0;
 
@@ -16,7 +18,7 @@ public class Ship {
         hits++;
     }
 
-    boolean isSunk() {
+    public boolean isSunk() {
         return hits >= length;
     }
 }

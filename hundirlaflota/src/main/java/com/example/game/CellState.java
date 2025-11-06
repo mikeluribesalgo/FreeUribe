@@ -1,4 +1,4 @@
-package com.example;
+package com.example.game;
 
 public enum CellState {
     EMPTY,   // Celda vacía (agua)
