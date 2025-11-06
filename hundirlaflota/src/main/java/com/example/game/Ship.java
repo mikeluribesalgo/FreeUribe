@@ -1,4 +1,4 @@
-package com.example;
+package com.example.game;
 
 public class Ship {
     final int r; 
@@ -18,7 +18,7 @@ public class Ship {
         hits++;
     }
 
-    boolean isSunk() {
+    public boolean isSunk() {
         return hits >= length;
     }
 }

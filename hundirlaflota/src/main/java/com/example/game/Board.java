@@ -1,4 +1,4 @@
-package com.example;
+package com.example.game;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class Board {
         for (int i = 0; i < ship.length; i++) {
             Cell cell = horizontalCell(ship, i);
             cell.setState(CellState.SHIP);
-            cell.ship = ship;
+            cell.setShip(ship);
         }
     }
 
@@ -64,8 +64,8 @@ public class Board {
         ships.clear();
         for (int r = 0; r < size; r++) {
             for (int c = 0; c < size; c++) {
-                cells[r][c].state = CellState.EMPTY;
-                cells[r][c].ship = null;
+                cells[r][c].setState(CellState.EMPTY);
+                cells[r][c].setShip( null);
             }
         }
     }

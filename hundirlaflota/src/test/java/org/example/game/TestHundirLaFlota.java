@@ -1,9 +1,11 @@
-package org.example;
+package org.example.game;
 
 import javax.swing.SwingUtilities;
 
 import org.junit.Test;
-import com.example.GameFrame;
+
+import com.example.gui.GameFrame;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 

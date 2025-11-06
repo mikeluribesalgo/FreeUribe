@@ -1,11 +1,7 @@
-package com.example;
+package com.example.game;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
 import java.awt.Point;
+import java.util.*;
 
 public class GameEngine {
     final int size;
@@ -13,10 +9,10 @@ public class GameEngine {
     private Board enemyBoard;
     private Random rand = new Random();
     private Set<Point> cpuTried = new HashSet<>();
+    private GameMode mode = GameMode.VS_CPU;
+    private NetworkManager network;
 
-    // simple ship sizes: portaaviones(5), acorazado(4), crucero(3), submarino(3),
-    // destructor(2)
-    private static final int[] SHIP_SIZES = { 5, 4, 3, 3, 2 };
+    private static final int[] SHIP_SIZES = {5, 4, 3, 3, 2};
 
     public GameEngine(int size) {
         this.size = size;
@@ -26,9 +22,23 @@ public class GameEngine {
     public void reset() {
         playerBoard = new Board(size);
         enemyBoard = new Board(size);
-        placeShipsRandomly(playerBoard);
-        placeShipsRandomly(enemyBoard);
+        if (mode == GameMode.VS_CPU) {
+            placeShipsRandomly(enemyBoard);
+        }
         cpuTried.clear();
+    }
+
+    public void setNetworkManager(NetworkManager net) {
+        this.network = net;
+        this.mode = GameMode.VS_PLAYER;
+    }
+
+    public NetworkManager getNetworkManager() {
+        return network;
+    }
+
+    public GameMode getMode() {
+        return mode;
     }
 
     public Board getPlayerBoard() {
@@ -60,36 +70,34 @@ public class GameEngine {
 
     public boolean playerShoot(int row, int col) {
         Cell cell = enemyBoard.cells[row][col];
-        if (cell.state == CellState.HIT || cell.state == CellState.MISS)
-            return false; // ya probado
-        if (cell.state == CellState.SHIP) {
-            cell.state = CellState.HIT;
-            cell.ship.hit();
+        if (cell.getState() == CellState.HIT || cell.getState() == CellState.MISS) return false;
+        if (cell.getState() == CellState.SHIP) {
+            cell.setState(CellState.HIT);
+            cell.getShip().hit();
             return true;
         } else {
-            cell.state = CellState.MISS;
+            cell.setState(CellState.MISS);
             return true;
         }
     }
 
     public void cpuTurn() {
-        // CPU dispara aleatoriamente entre celdas no probadas
+        if (mode == GameMode.VS_PLAYER) return;
         List<Point> options = new ArrayList<>();
         for (int r = 0; r < size; r++)
             for (int c = 0; c < size; c++) {
                 Cell cell = playerBoard.cells[r][c];
-                if (cell.state != CellState.HIT && cell.state != CellState.MISS)
+                if (cell.getState() != CellState.HIT && cell.getState() != CellState.MISS)
                     options.add(new Point(r, c));
             }
-        if (options.isEmpty())
-            return;
+        if (options.isEmpty()) return;
         Point p = options.get(rand.nextInt(options.size()));
         Cell target = playerBoard.cells[p.x][p.y];
-        if (target.state == CellState.SHIP) {
-            target.state = CellState.HIT;
-            target.ship.hit();
+        if (target.getState() == CellState.SHIP) {
+            target.setState(CellState.HIT);
+            target.getShip().hit();
         } else {
-            target.state = CellState.MISS;
+            target.setState(CellState.MISS);
         }
     }
 
@@ -100,9 +108,7 @@ public class GameEngine {
     }
 
     public String getStats() {
-        return String.format("Barcos tuyos: %d Barcos enemigos: %d",
+        return String.format("Barcos tuyos: %d | Barcos enemigos: %d",
                 playerBoard.remainingShipsCount(), enemyBoard.remainingShipsCount());
     }
-    
-
 }

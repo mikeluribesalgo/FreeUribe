@@ -1,10 +1,17 @@
-package com.example;
+package com.example.gui;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+
+import com.example.game.Board;
+import com.example.game.Cell;
+
 import java.awt.GridLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+
+
+
 
 public class BoardPanel extends JPanel {
 

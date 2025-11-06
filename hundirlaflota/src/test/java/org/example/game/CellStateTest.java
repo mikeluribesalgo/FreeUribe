@@ -1,7 +1,8 @@
-package org.example;
+package org.example.game;
 
 import org.junit.jupiter.api.Test;
-import com.example.CellState;
+
+import com.example.game.CellState;
 
 import static org.junit.jupiter.api.Assertions.*;
 

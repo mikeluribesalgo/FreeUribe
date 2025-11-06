@@ -1,6 +1,8 @@
-package com.example;
+package com.example.game;
 
 import javax.swing.SwingUtilities;
+
+import com.example.gui.GameFrame;
 
 //mikel
 

@@ -1,11 +1,11 @@
-package org.example;
+package org.example.game;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.example.Board;
-import com.example.CellState;
-import com.example.Ship;
+import com.example.game.Board;
+import com.example.game.CellState;
+import com.example.game.Ship;
 
 import static org.junit.jupiter.api.Assertions.*;
 
