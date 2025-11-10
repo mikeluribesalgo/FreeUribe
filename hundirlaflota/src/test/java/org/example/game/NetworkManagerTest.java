@@ -5,7 +5,6 @@ import org.junit.jupiter.api.*;
 import com.example.game.NetworkManager;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.IOException;
 import java.util.concurrent.*;
 
@@ -69,6 +68,7 @@ import java.util.concurrent.*;
             assertDoesNotThrow(nm::close);
         }
     }
+    
 
     @Test
     void testIsServerFlag() throws IOException {

@@ -94,4 +94,20 @@ class GameEngineTest {
         assertTrue(stats.contains("Barcos tuyos"));
         assertTrue(stats.contains("Barcos enemigos"));
     }
+
+    @Test
+    void testResetClearsBoards() {
+        Board player = engine.getPlayerBoard();
+        Board enemy = engine.getEnemyBoard();
+
+        // Place ships on both boards
+        player.placeShip(new Ship(0, 0, 2, true));
+        enemy.placeShip(new Ship(0, 0, 2, true));
+
+        engine.reset();
+
+        // Both boards should be cleared
+        assertEquals(1, player.getShips().size());
+        
+    }
 }

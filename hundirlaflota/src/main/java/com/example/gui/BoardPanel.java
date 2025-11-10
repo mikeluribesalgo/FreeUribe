@@ -97,7 +97,7 @@ public class BoardPanel extends JPanel {
         repaint();
     }
 
-    interface CellClickListener {
+    public interface CellClickListener {
         void cellClicked(int row, int col);
     }
 }

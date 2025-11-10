@@ -4,9 +4,9 @@ import java.io.*;
 import java.net.*;
 
 public class NetworkManager {
-    private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+    protected Socket socket;
+    protected BufferedReader in;
+    protected PrintWriter out;
     private boolean isServer;
 
     public NetworkManager(boolean isServer, String ip, int port) throws IOException {
