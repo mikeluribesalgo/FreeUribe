@@ -12,7 +12,7 @@ public class GameFrame extends JFrame {
     private GameEngine engine;
     private JLabel statusLabel;
 
-    // NUEVO: lista de tamaños de barcos a colocar
+    //Lista de tamaños de barcos a colocar
     private Queue<Integer> shipsToPlace = new LinkedList<>(Arrays.asList(5, 4, 3, 3, 2));
     private boolean placementPhase = true;
     private boolean horizontal = true;
@@ -23,13 +23,13 @@ public class GameFrame extends JFrame {
         setResizable(false);
 
         engine = new GameEngine(SIZE);
-        // Tablero del jugador vacío (sin barcos)
+        // Tablero del jugador vacio (sin barcos)
         engine.getPlayerBoard().clearBoard();
 
         playerPanel = new BoardPanel(engine.getPlayerBoard(), false);
         enemyPanel = new BoardPanel(engine.getEnemyBoard(), true);
 
-        // --- COLOCACIÓN MANUAL ---
+        // --- COLOCACION MANUAL ---
         playerPanel.setCellClickListener((r, c) -> {
             if (!placementPhase) return;
 
@@ -39,7 +39,7 @@ public class GameFrame extends JFrame {
             Board board = engine.getPlayerBoard();
             if (board.canPlaceShip(r, c, shipSize, horizontal)) {
                 board.placeShip(new Ship(r, c, shipSize, horizontal));
-                shipsToPlace.poll(); // quitar el que ya se colocó
+                shipsToPlace.poll(); // quitar el que ya se coloco
                 playerPanel.repaintGrid();
 
                 if (shipsToPlace.isEmpty()) {
@@ -56,7 +56,7 @@ public class GameFrame extends JFrame {
 
         // --- DISPAROS ---
         enemyPanel.setCellClickListener((r, c) -> {
-            if (placementPhase) return; // aún colocando barcos
+            if (placementPhase) return; // aun colocando barcos
             if (engine.isGameOver()) return;
 
             boolean valid = engine.playerShoot(r, c);
