@@ -24,6 +24,7 @@ public class GameFrame extends JFrame {
     private Queue<Integer> shipsToPlace;
     private boolean placementPhase;
     private boolean horizontal;
+    private static final String ACTION_1 = "TOCADO";
 
     // 🔹 NUEVO
     private transient NetworkGameHandler netHandler;
@@ -234,22 +235,32 @@ public class GameFrame extends JFrame {
     }
 
     public String applyEnemyShot(String coord) {
-        String[] p = coord.split(",");
-        int r = Integer.parseInt(p[0]);
-        int c = Integer.parseInt(p[1]);
-        Cell cell = engine.getPlayerBoard().getCell(r, c);
-        String result;
-        if (cell.getState() == CellState.SHIP) {
-            cell.setState( CellState.HIT);
-            cell.getShip().hit();
-            result = cell.getShip().isSunk() ? "HUNDIDO" : "TOCADO";
-        } else {
-            cell.setState(CellState.MISS);
-            result = "AGUA";
-        }
-        refreshBoards();
-        return result;
+    String[] p = coord.split(",");
+    int r = Integer.parseInt(p[0]);
+    int c = Integer.parseInt(p[1]);
+    Cell cell = engine.getPlayerBoard().getCell(r, c);
+    String result;
+
+    
+    if (cell.getState() == CellState.HIT) {
+        return ACTION_1;
+    } else if (cell.getState() == CellState.MISS) {
+        return "AGUA";
     }
+
+    
+    if (cell.getState() == CellState.SHIP) {
+        cell.setState(CellState.HIT);
+        cell.getShip().hit();
+        result = cell.getShip().isSunk() ? "HUNDIDO" : ACTION_1 ;
+    } else {
+        cell.setState(CellState.MISS);
+        result = "AGUA";
+    }
+
+    refreshBoards();
+    return result;
+}
 
     public void applyEnemyResult(String coord, String result) {
     String[] p = coord.split(",");
@@ -259,7 +270,7 @@ public class GameFrame extends JFrame {
 
     if (result.equals("AGUA")) {
         cell.setState(CellState.MISS);
-    } else if (result.equals("TOCADO") || result.equals("HUNDIDO")) {
+    } else if (result.equals(ACTION_1) || result.equals("HUNDIDO")) {
         cell.setState(CellState.HIT);
     }
     refreshBoards();
