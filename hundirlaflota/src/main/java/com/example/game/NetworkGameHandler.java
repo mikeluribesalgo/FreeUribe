@@ -1,7 +1,6 @@
 package com.example.game;
 
 import java.io.IOException;
-
 import com.example.gui.GameFrame;
 
 public class NetworkGameHandler extends Thread {
@@ -17,48 +16,70 @@ public class NetworkGameHandler extends Thread {
         this.net = engine.getNetworkManager();
         this.myTurn = startFirst;
     }
+    //
 
     @Override
     public void run() {
-        boolean disconnected = false;
-
-while (running && !engine.isGameOver() && !disconnected) {
-    try {
-        ui.enableEnemyBoard(myTurn);
-
-        if (myTurn) {
-            ui.setStatus("🎯 Tu turno: dispara al tablero enemigo.");
-            Thread.sleep(200); // evita bucle ocupado
-        } else {
-            ui.setStatus("⌛ Esperando disparo del oponente...");
-            String shot = net.receive(); // formato "r,c"
-
-            if (shot == null) {
-                disconnected = true; // en lugar de break
-            } else {
-                String result = ui.applyEnemyShot(shot);
-                net.send(result);
-                myTurn = result.equals("AGUA");
+        try {
+            // 🔹 Sincronización inicial: ambos jugadores confirman "READY"
+            net.send("READY");
+            String msg = net.receive();
+            if (!"READY".equals(msg)) {
+                ui.showError("Error de sincronización inicial con el otro jugador.");
+                return;
             }
+        } catch (IOException e) {
+            ui.showError("Error al iniciar partida: " + e.getMessage());
+            return;
         }
 
-    } catch (IOException e) {
-        running = false;
-        ui.showError("Error de red: " + e.getMessage());
-    } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
+        // 🔹 Bucle principal de juego
+        while (running) {
+            try {
+                // Si termina el juego, avisamos al UI (donde se ofrece revancha)
+                if (engine.isGameOver()) {
+                    ui.handleNetworkGameEnd(this);
+                    return;
+                }
+
+                if (myTurn) {
+                    ui.enableEnemyBoard(true);
+                    ui.setStatus("🎯 Tu turno: dispara al tablero enemigo.");
+                    Thread.sleep(200); // pequeña pausa para evitar bucles ocupados
+                } else {
+                    ui.enableEnemyBoard(false);
+                    ui.setStatus("⌛ Esperando disparo del oponente...");
+
+                    String shot = net.receive(); // formato "r,c"
+                    if (shot == null)
+                        break; // desconexión
+
+                    String result = ui.applyEnemyShot(shot);
+                    net.send(result);
+
+                    // 🔹 Si el oponente falló, ahora te toca
+                    if (result.equals("AGUA")) {
+                        myTurn = true;
+                    }
+                    // Si acierta, sigue él (no cambiamos myTurn)
+                }
+
+            } catch (IOException e) {
+                running = false;
+                ui.showError("Error de red: " + e.getMessage());
+            } catch (InterruptedException ignored) {
+            }
+        }
     }
-}
 
-
-
-
-        ui.setStatus("El juego ha terminado.");
+    public void stopHandler() {
+        running = false;
     }
 
     // 🔹 Cuando tú haces clic en el tablero enemigo
     public void playerShot(int r, int c) {
-        if (!myTurn || engine.isGameOver()) return;
+        if (!myTurn || engine.isGameOver())
+            return;
 
         try {
             String coord = r + "," + c;

@@ -69,9 +69,11 @@ public class GameFrame extends JFrame {
 
     private void setupPlacementListener() {
         playerPanel.setCellClickListener((r, c) -> {
-            if (!placementPhase) return;
+            if (!placementPhase)
+                return;
             Integer shipSize = shipsToPlace.peek();
-            if (shipSize == null) return;
+            if (shipSize == null)
+                return;
 
             Board board = engine.getPlayerBoard();
             if (board.canPlaceShip(r, c, shipSize, horizontal)) {
@@ -98,7 +100,7 @@ public class GameFrame extends JFrame {
 
     // 🔹 NUEVO: elegir modo (CPU o red)
     private void askGameMode() {
-        String[] options = {"Contra CPU", "Jugador vs Jugador"};
+        String[] options = { "Contra CPU", "Jugador vs Jugador" };
         int choice = JOptionPane.showOptionDialog(this,
                 "Selecciona modo de juego:",
                 "Modo de juego",
@@ -106,8 +108,10 @@ public class GameFrame extends JFrame {
                 JOptionPane.QUESTION_MESSAGE,
                 null, options, options[0]);
 
-        if (choice == 1) setupNetworkMode();
-        else startVsCpu();
+        if (choice == 1)
+            setupNetworkMode();
+        else
+            startVsCpu();
     }
 
     private void startVsCpu() {
@@ -118,7 +122,7 @@ public class GameFrame extends JFrame {
     // 🔹 NUEVO: configurar conexión red
     private void setupNetworkMode() {
         try {
-            String[] roles = {"Servidor (Jugador 1)", "Cliente (Jugador 2)"};
+            String[] roles = { "Servidor (Jugador 1)", "Cliente (Jugador 2)" };
             int role = JOptionPane.showOptionDialog(this,
                     "¿Quieres ser el servidor o el cliente?",
                     "Modo red",
@@ -147,12 +151,15 @@ public class GameFrame extends JFrame {
 
     private void setupEnemyListener() {
         enemyPanel.setCellClickListener((r, c) -> {
-            if (placementPhase || engine.isGameOver()) return;
+            if (placementPhase || engine.isGameOver())
+                return;
 
             if (engine.getNetworkManager() == null) { // modo CPU
-                if (!engine.playerShoot(r, c)) return;
+                if (!engine.playerShoot(r, c))
+                    return;
                 refreshBoards();
-                if (checkGameEnd()) return;
+                if (checkGameEnd())
+                    return;
                 engine.cpuTurn();
                 refreshBoards();
                 checkGameEnd();
@@ -240,7 +247,7 @@ public class GameFrame extends JFrame {
         Cell cell = engine.getPlayerBoard().getCell(r, c);
         String result;
         if (cell.getState() == CellState.SHIP) {
-            cell.setState( CellState.HIT);
+            cell.setState(CellState.HIT);
             cell.getShip().hit();
             result = cell.getShip().isSunk() ? "HUNDIDO" : "TOCADO";
         } else {
@@ -252,26 +259,81 @@ public class GameFrame extends JFrame {
     }
 
     public void applyEnemyResult(String coord, String result) {
-    String[] p = coord.split(",");
-    int r = Integer.parseInt(p[0]);
-    int c = Integer.parseInt(p[1]);
-    Cell cell = engine.getEnemyBoard().getCell(r, c);
+        String[] p = coord.split(",");
+        int r = Integer.parseInt(p[0]);
+        int c = Integer.parseInt(p[1]);
+        Cell cell = engine.getEnemyBoard().getCell(r, c);
 
-    if (result.equals("AGUA")) {
-        cell.setState(CellState.MISS);
-    } else if (result.equals("TOCADO") || result.equals("HUNDIDO")) {
-        cell.setState(CellState.HIT);
+        if (result.equals("AGUA")) {
+            cell.setState(CellState.MISS);
+        } else if (result.equals("TOCADO") || result.equals("HUNDIDO")) {
+            cell.setState(CellState.HIT);
+        }
+        refreshBoards();
     }
-    refreshBoards();
-}
 
     public void showError(String msg) {
-        SwingUtilities.invokeLater(() ->
-                JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE));
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE));
     }
 
     public void setStatus(String msg) {
         SwingUtilities.invokeLater(() -> statusLabel.setText(msg));
+    }
+
+    // 🔹 NUEVO: llamado desde NetworkGameHandler al acabar la partida
+    public void handleNetworkGameEnd(NetworkGameHandler handler) {
+        SwingUtilities.invokeLater(() -> {
+            enableEnemyBoard(false);
+            String[] options = { "🔁 Revancha", "🤖 Jugar contra CPU", "🚪 Salir" };
+            int choice = JOptionPane.showOptionDialog(
+                    this,
+                    "¡El juego ha terminado! ¿Qué deseas hacer?",
+                    "Fin de partida",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[0]);
+
+            if (choice == 0) { // Revancha
+                restartForRematch();
+            } else if (choice == 1) { // Cambiar a CPU
+                startVsCpu();
+            } else {
+                System.exit(0);
+            }
+        });
+    }
+
+    // 🔹 NUEVO: reinicia el tablero pero mantiene la conexión existente
+    private void restartForRematch() {
+        engine.reset();
+        engine.getPlayerBoard().clearBoard();
+        engine.getEnemyBoard().clearBoard();
+        setupInitialState();
+        playerPanel.setBoard(engine.getPlayerBoard());
+        enemyPanel.setBoard(engine.getEnemyBoard());
+        refreshBoards();
+
+        // Espera que ambos estén listos
+        boolean isServer = engine.getNetworkManager().isServer();
+        try {
+            engine.getNetworkManager().send("READY");
+            String msg = engine.getNetworkManager().receive();
+            if (!"READY".equals(msg)) {
+                setStatus("Esperando al otro jugador...");
+                return;
+            }
+        } catch (IOException e) {
+            showError("Error de sincronización: " + e.getMessage());
+            return;
+        }
+
+        // Reinicia el flujo de juego sin desconectar
+        boolean startFirst = isServer;
+        netHandler = new NetworkGameHandler(engine, this, startFirst);
+        netHandler.start();
+
+        placementPhase = false;
+        setStatus("Partida reiniciada. " + (startFirst ? "Empiezas tú." : "Espera tu turno..."));
     }
 
 }
