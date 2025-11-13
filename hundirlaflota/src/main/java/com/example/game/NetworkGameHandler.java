@@ -28,7 +28,7 @@ while (running && !engine.isGameOver() && !disconnected) {
 
         if (myTurn) {
             ui.setStatus("🎯 Tu turno: dispara al tablero enemigo.");
-            Thread.sleep(200); // evita bucle ocupado
+            
         } else {
             ui.setStatus("⌛ Esperando disparo del oponente...");
             String shot = net.receive(); // formato "r,c"
@@ -45,8 +45,6 @@ while (running && !engine.isGameOver() && !disconnected) {
     } catch (IOException e) {
         running = false;
         ui.showError("Error de red: " + e.getMessage());
-    } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
     }
 }
 

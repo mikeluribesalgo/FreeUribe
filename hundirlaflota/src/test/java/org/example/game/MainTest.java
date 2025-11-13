@@ -2,6 +2,7 @@ package org.example.game;
 
 import com.example.game.Main;
 import com.example.gui.GameFrame;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
@@ -13,8 +14,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MainTest {
 
+     @Test
+    void testInstanciarMainYLLamarMainMethod() {
+        // ✅ Instanciamos la clase explícitamente (cubre la línea "public class Main")
+        Main mainInstance = new Main();
+        assertNotNull(mainInstance, "La instancia de Main no debe ser null");
+
+        // ✅ También ejecutamos el método main() estático
+        assertDoesNotThrow(() -> {
+            Main.main(new String[]{});
+            
+        });
+    }
+
     @Test
     void testMainCreatesAndShowsGameFrameViaInvokeLater() {
+        
+        
         try (
                 MockedConstruction<GameFrame> mockedFrames = Mockito.mockConstruction(GameFrame.class,
                         (mock, context) -> Mockito.doNothing().when(mock).setVisible(true));

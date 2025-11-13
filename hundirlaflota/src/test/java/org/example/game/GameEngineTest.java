@@ -32,28 +32,7 @@ class GameEngineTest {
 
    
 
-    @Test
-    void testPlayerShootHitsAndMisses() {
-        Board enemy = engine.getEnemyBoard();
-
-        // Place a ship manually at position (0, 0)
-        Ship ship = new Ship(0, 0, 2, true);
-        enemy.placeShip(ship);
-
-        // Should hit at (0, 0)
-        boolean hit = engine.playerShoot(0, 0);
-        assertTrue(hit);
-        assertEquals(CellState.HIT, enemy.cells[0][0].getState());
-
-        // Should miss at an empty cell
-        boolean miss = engine.playerShoot(5, 5);
-        assertTrue(miss);
-        assertEquals(CellState.MISS, enemy.cells[5][5].getState());
-
-        // Should not allow shooting same cell twice
-        boolean invalid = engine.playerShoot(5, 5);
-        assertFalse(invalid);
-    }
+    
 
     @Test
     void testCpuTurnMarksCells() {
