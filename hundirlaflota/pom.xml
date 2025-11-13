@@ -14,8 +14,9 @@
         <maven.compiler.source>11</maven.compiler.source>
         <java.version>11</java.version>
         <kotlin.version>1.4.10</kotlin.version>
-        <sonar.projectKey>prueba1</sonar.projectKey>
-        <sonar.projectName>prueba1</sonar.projectName>
+        <mockito.version>5.8.0</mockito.version>
+        <sonar.projectKey>Hundirlaflota</sonar.projectKey>
+        <sonar.projectName>Hundirlaflota</sonar.projectName>
         <sonar.sources>src/main/java</sonar.sources>
     </properties>
     <dependencies>
@@ -30,6 +31,28 @@
             <artifactId>kotlin-stdlib-jdk8</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Integración Mockito + JUnit 5 -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Opcional: mockito-inline para mockear clases/final/static si hace falta -->
+        
     </dependencies>
     <build>
         <pluginManagement>

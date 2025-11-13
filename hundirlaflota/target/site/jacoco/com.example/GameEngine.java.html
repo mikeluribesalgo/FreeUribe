@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameEngine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Example of multilingual Maven project</a> &gt; <a href="index.source.html" class="el_package">com.example</a> &gt; <span class="el_source">GameEngine.java</span></div><h1>GameEngine.java</h1><pre class="source lang-java linenums">package com.example;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.awt.Point;
+
+public class GameEngine {
+    final int size;
+    private Board playerBoard;
+    private Board enemyBoard;
+<span class="fc" id="L14">    private Random rand = new Random();</span>
+<span class="fc" id="L15">    private Set&lt;Point&gt; cpuTried = new HashSet&lt;&gt;();</span>
+
+    // simple ship sizes: portaaviones(5), acorazado(4), crucero(3), submarino(3),
+    // destructor(2)
+<span class="fc" id="L19">    private static final int[] SHIP_SIZES = { 5, 4, 3, 3, 2 };</span>
+
+<span class="fc" id="L21">    public GameEngine(int size) {</span>
+<span class="fc" id="L22">        this.size = size;</span>
+<span class="fc" id="L23">        reset();</span>
+<span class="fc" id="L24">    }</span>
+
+    public void reset() {
+<span class="fc" id="L27">        playerBoard = new Board(size);</span>
+<span class="fc" id="L28">        enemyBoard = new Board(size);</span>
+<span class="fc" id="L29">        placeShipsRandomly(playerBoard);</span>
+<span class="fc" id="L30">        placeShipsRandomly(enemyBoard);</span>
+<span class="fc" id="L31">        cpuTried.clear();</span>
+<span class="fc" id="L32">    }</span>
+
+    public Board getPlayerBoard() {
+<span class="nc" id="L35">        return playerBoard;</span>
+    }
+
+    public Board getEnemyBoard() {
+<span class="nc" id="L39">        return enemyBoard;</span>
+    }
+
+    private void placeShipsRandomly(Board board) {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        for (int s : SHIP_SIZES) {</span>
+<span class="fc" id="L44">            boolean placed = false;</span>
+<span class="fc" id="L45">            int attempts = 0;</span>
+<span class="pc bpc" id="L46" title="1 of 4 branches missed.">            while (!placed &amp;&amp; attempts &lt; 500) {</span>
+<span class="fc" id="L47">                attempts++;</span>
+<span class="fc" id="L48">                boolean horizontal = rand.nextBoolean();</span>
+<span class="fc" id="L49">                int r = rand.nextInt(size);</span>
+<span class="fc" id="L50">                int c = rand.nextInt(size);</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">                if (board.canPlaceShip(r, c, s, horizontal)) {</span>
+<span class="fc" id="L52">                    board.placeShip(new Ship(r, c, s, horizontal));</span>
+<span class="fc" id="L53">                    placed = true;</span>
+                }
+<span class="fc" id="L55">            }</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">            if (!placed)</span>
+<span class="nc" id="L57">                throw new IllegalArgumentException(&quot;No se pudo colocar un barco después de muchos intentos&quot;);</span>
+        }
+<span class="fc" id="L59">    }</span>
+
+    public boolean playerShoot(int row, int col) {
+<span class="nc" id="L62">        Cell cell = enemyBoard.cells[row][col];</span>
+<span class="nc bnc" id="L63" title="All 4 branches missed.">        if (cell.state == CellState.HIT || cell.state == CellState.MISS)</span>
+<span class="nc" id="L64">            return false; // ya probado</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if (cell.state == CellState.SHIP) {</span>
+<span class="nc" id="L66">            cell.state = CellState.HIT;</span>
+<span class="nc" id="L67">            cell.ship.hit();</span>
+<span class="nc" id="L68">            return true;</span>
+        } else {
+<span class="nc" id="L70">            cell.state = CellState.MISS;</span>
+<span class="nc" id="L71">            return true;</span>
+        }
+    }
+
+    public void cpuTurn() {
+        // CPU dispara aleatoriamente entre celdas no probadas
+<span class="nc" id="L77">        List&lt;Point&gt; options = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        for (int r = 0; r &lt; size; r++)</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">            for (int c = 0; c &lt; size; c++) {</span>
+<span class="nc" id="L80">                Cell cell = playerBoard.cells[r][c];</span>
+<span class="nc bnc" id="L81" title="All 4 branches missed.">                if (cell.state != CellState.HIT &amp;&amp; cell.state != CellState.MISS)</span>
+<span class="nc" id="L82">                    options.add(new Point(r, c));</span>
+            }
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        if (options.isEmpty())</span>
+<span class="nc" id="L85">            return;</span>
+<span class="nc" id="L86">        Point p = options.get(rand.nextInt(options.size()));</span>
+<span class="nc" id="L87">        Cell target = playerBoard.cells[p.x][p.y];</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (target.state == CellState.SHIP) {</span>
+<span class="nc" id="L89">            target.state = CellState.HIT;</span>
+<span class="nc" id="L90">            target.ship.hit();</span>
+        } else {
+<span class="nc" id="L92">            target.state = CellState.MISS;</span>
+        }
+<span class="nc" id="L94">    }</span>
+
+    public boolean isGameOver() {
+<span class="nc" id="L97">        boolean playerShips = playerBoard.hasRemainingShips();</span>
+<span class="nc" id="L98">        boolean enemyShips = enemyBoard.hasRemainingShips();</span>
+<span class="nc bnc" id="L99" title="All 4 branches missed.">        return !playerShips || !enemyShips;</span>
+    }
+
+    public String getStats() {
+<span class="nc" id="L103">        return String.format(&quot;Barcos tuyos: %d Barcos enemigos: %d&quot;,</span>
+<span class="nc" id="L104">                playerBoard.remainingShipsCount(), enemyBoard.remainingShipsCount());</span>
+    }
+    
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

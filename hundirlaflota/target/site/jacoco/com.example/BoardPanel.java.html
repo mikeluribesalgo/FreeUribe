@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BoardPanel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Example of multilingual Maven project</a> &gt; <a href="index.source.html" class="el_package">com.example</a> &gt; <span class="el_source">BoardPanel.java</span></div><h1>BoardPanel.java</h1><pre class="source lang-java linenums">package com.example;
+
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import java.awt.GridLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+
+public class BoardPanel extends JPanel {
+
+    
+    private CellButton[][] buttons;
+    private transient  Board board;
+    private boolean hideShips;
+    private transient  CellClickListener listener;
+
+<span class="nc" id="L17">    public BoardPanel (Board board, boolean hideShips)  {</span>
+        
+<span class="nc" id="L19">        this.board = board;</span>
+<span class="nc" id="L20">        this.hideShips = hideShips;</span>
+<span class="nc" id="L21">        setLayout(new GridLayout(board.size, board.size));</span>
+<span class="nc" id="L22">        buttons = new CellButton[board.size][board.size];</span>
+<span class="nc" id="L23">        buildGrid();</span>
+<span class="nc" id="L24">    }</span>
+
+    public void setBoard(Board b) {
+<span class="nc" id="L27">        this.board = b;</span>
+<span class="nc" id="L28">        removeAll();</span>
+<span class="nc" id="L29">        setLayout(new GridLayout(board.size, board.size));</span>
+<span class="nc" id="L30">        buttons = new CellButton[board.size][board.size];</span>
+<span class="nc" id="L31">        buildGrid();</span>
+<span class="nc" id="L32">        revalidate();</span>
+<span class="nc" id="L33">        repaint();</span>
+<span class="nc" id="L34">    }</span>
+
+    private void buildGrid() {
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        for (int r = 0; r &lt; board.size; r++) {</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">            for (int c = 0; c &lt; board.size; c++) {</span>
+<span class="nc" id="L39">                CellButton btn = new CellButton(r, c);</span>
+<span class="nc" id="L40">                btn.setPreferredSize(new Dimension(36, 36));</span>
+<span class="nc" id="L41">                btn.setOpaque(true);</span>
+<span class="nc" id="L42">                btn.setBorder(BorderFactory.createLineBorder(Color.GRAY));</span>
+<span class="nc" id="L43">                final int rr = r;</span>
+<span class="nc" id="L44">                final int cc = c;</span>
+<span class="nc" id="L45">                btn.addActionListener(e -&gt; {</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">                    if (listener != null)</span>
+<span class="nc" id="L47">                        listener.cellClicked(rr, cc);</span>
+<span class="nc" id="L48">                });</span>
+<span class="nc" id="L49">                buttons[r][c] = btn;</span>
+<span class="nc" id="L50">                add(btn);</span>
+            }
+        }
+<span class="nc" id="L53">        repaintGrid();</span>
+<span class="nc" id="L54">    }</span>
+
+    public void setCellClickListener(CellClickListener l) {
+<span class="nc" id="L57">        this.listener = l;</span>
+<span class="nc" id="L58">    }</span>
+
+    public void repaintGrid() {
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        for (int r = 0; r &lt; board.size; r++) {</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">            for (int c = 0; c &lt; board.size; c++) {</span>
+<span class="nc" id="L63">                Cell cell = board.cells[r][c];</span>
+<span class="nc" id="L64">                CellButton btn = buttons[r][c];</span>
+<span class="nc bnc" id="L65" title="All 5 branches missed.">                switch (cell.state) {</span>
+                    case EMPTY:
+<span class="nc" id="L67">                        btn.setText(&quot;&quot;);</span>
+<span class="nc" id="L68">                        btn.setBackground(new Color(173, 216, 230)); // agua</span>
+<span class="nc" id="L69">                        break;</span>
+                    case SHIP:
+<span class="nc" id="L71">                        btn.setText(&quot;&quot;);</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">                        if (hideShips) {</span>
+<span class="nc" id="L73">                            btn.setBackground(new Color(173, 216, 230));</span>
+                        } else {
+<span class="nc" id="L75">                            btn.setBackground(new Color(100, 149, 237)); // barco visible</span>
+                        }
+<span class="nc" id="L77">                        break;</span>
+                    case HIT:
+<span class="nc" id="L79">                        btn.setText(&quot;X&quot;);</span>
+<span class="nc" id="L80">                        btn.setBackground(new Color(220, 20, 60)); // rojo</span>
+<span class="nc" id="L81">                        break;</span>
+                    case MISS:
+<span class="nc" id="L83">                        btn.setText(&quot;•&quot;);</span>
+<span class="nc" id="L84">                        btn.setBackground(new Color(240, 248, 255)); // claro</span>
+                        break;
+                }
+            }
+        }
+<span class="nc" id="L89">        revalidate();</span>
+<span class="nc" id="L90">        repaint();</span>
+<span class="nc" id="L91">    }</span>
+
+    interface CellClickListener {
+        void cellClicked(int row, int col);
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
